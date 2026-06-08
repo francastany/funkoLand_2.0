@@ -59,7 +59,7 @@ export async function createOrder({
   if (error) throw createServiceError(error.message, error.code);
 
   // Fire-and-forget: don't fail the order if the email errors.
-  handleEmails({ email: buyer.email, name: buyer.name, funkos: items }).catch(
+  handleEmails({ email: buyer.email, name: buyer.name, funkos: items, total }).catch(
     console.error,
   );
 }
