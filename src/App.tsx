@@ -30,10 +30,10 @@ function App() {
             <main className="max-w-6xl mx-auto py-8 px-6 xl:px-0">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/funkos" element={<Funkos />} />
-                <Route path="/funkos/:id" element={<FunkoDetail />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/funkos" element={<Funkos />} />
+                <Route path="/funkos/:id" element={<FunkoDetail />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
