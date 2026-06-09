@@ -158,7 +158,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    return res.status(500).json({ error: (body as { message?: string }).message ?? response.statusText });
+    console.error("Brevo API error:", {
+      status: response.status,
+      statusText: response.statusText,
+      body,
+    });
+    return res.status(response.status).json({
+      error: (body as { message?: string }).message ?? response.statusText,
+      brevoStatus: response.status,
+      brevoBody: body,
+    });
   }
 
   return res.status(200).json({ success: true });
