@@ -4,44 +4,55 @@ import type { Profile, UpdateProfile } from "@/types";
 
 const TABLE = "profiles";
 
+/** Default empty profile for when no row exists yet. */
+function defaultProfile(userId: string): Profile {
+  const now = new Date().toISOString();
+  return {
+    id: userId,
+    full_name: "",
+    phone: "",
+    avatar_url: "",
+    address: "",
+    city: "",
+    country: "",
+    postal_code: "",
+    updated_at: now,
+    created_at: now,
+  };
+}
+
 /**
  * Fetch the profile for the given user.
- * If no profile row exists (legacy user), auto-creates one via upsert.
+ * Uses maybeSingle() to avoid 406 errors when the row doesn't exist.
+ * If no row is found, returns a default empty profile — the row will
+ * be created on first save via upsert in updateProfile().
  */
 export async function fetchProfile(userId: string): Promise<Profile> {
   const { data, error } = await supabase
     .from(TABLE)
     .select("*")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
-  if (error) {
-    // Row doesn't exist yet → create it
-    if (error.code === "PGRST116") {
-      const { data: created, error: insertError } = await supabase
-        .from(TABLE)
-        .upsert({ id: userId })
-        .select("*")
-        .single();
+  if (error) throw createServiceError(error.message, error.code);
 
-      if (insertError) throw createServiceError(insertError.message, insertError.code);
-      return created;
-    }
-    throw createServiceError(error.message, error.code);
-  }
+  // No profile row yet → return defaults (will be created on save)
+  if (!data) return defaultProfile(userId);
 
   return data;
 }
 
-/** Update the profile for the given user. */
+/**
+ * Update (or create) the profile for the given user.
+ * Uses upsert so the row is created if it doesn't exist yet.
+ */
 export async function updateProfile(
   userId: string,
   updates: Omit<UpdateProfile, "id" | "created_at">,
 ): Promise<Profile> {
   const { data, error } = await supabase
     .from(TABLE)
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq("id", userId)
+    .upsert({ id: userId, ...updates, updated_at: new Date().toISOString() })
     .select("*")
     .single();
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   User,
@@ -56,9 +56,13 @@ export function Account() {
     }
   }, [authLoading, user, navigate]);
 
-  // Load profile and orders
+  // Guard to prevent re-fetching on auth state re-fires
+  const fetchedRef = useRef(false);
+
+  // Load profile and orders (runs once)
   useEffect(() => {
-    if (!user) return;
+    if (!user || fetchedRef.current) return;
+    fetchedRef.current = true;
 
     fetchProfile(user.id)
       .then((p) => {
