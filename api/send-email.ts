@@ -7,7 +7,12 @@ const SENDER_NAME = "Funkoland";
 const BRAND_COLOR = "#383e56";
 const FONT = "'Lato', Arial, Helvetica, sans-serif";
 
-function row(label: string, value: string, bold = false, shaded = false): string {
+function row(
+  label: string,
+  value: string,
+  bold = false,
+  shaded = false,
+): string {
   const bg = shaded ? "#f9f9f9" : "#ffffff";
   const weight = bold ? "bold" : "normal";
   return `
@@ -33,9 +38,16 @@ function totalRow(value: string): string {
     </table>`;
 }
 
-function buildHtml(name: string, items: { name: string; price: number }[], total: number, orderNumber: number): string {
+function buildHtml(
+  name: string,
+  items: { name: string; price: number }[],
+  total: number,
+  orderNumber: number,
+): string {
   const itemRows = items
-    .map((item, i) => row(`${item.name} (x1)`, `$${item.price.toFixed(2)}`, false, i % 2 === 1))
+    .map((item, i) =>
+      row(`${item.name} (x1)`, `$${item.price.toFixed(2)}`, false, i % 2 === 1),
+    )
     .join("");
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
