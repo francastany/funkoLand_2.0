@@ -52,6 +52,7 @@ export type Database = {
           id: string
           items: Json
           total: number
+          user_id: string | null
         }
         Insert: {
           buyer: Json
@@ -59,6 +60,7 @@ export type Database = {
           id?: string
           items: Json
           total: number
+          user_id?: string | null
         }
         Update: {
           buyer?: Json
@@ -66,6 +68,46 @@ export type Database = {
           id?: string
           items?: Json
           total?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          id: string
+          full_name: string
+          phone: string
+          avatar_url: string
+          address: string
+          city: string
+          country: string
+          postal_code: string
+          updated_at: string
+          created_at: string
+        }
+        Insert: {
+          id: string
+          full_name?: string
+          phone?: string
+          avatar_url?: string
+          address?: string
+          city?: string
+          country?: string
+          postal_code?: string
+          updated_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          full_name?: string
+          phone?: string
+          avatar_url?: string
+          address?: string
+          city?: string
+          country?: string
+          postal_code?: string
+          updated_at?: string
+          created_at?: string
         }
         Relationships: []
       }

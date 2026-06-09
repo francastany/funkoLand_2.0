@@ -37,6 +37,19 @@ export type Order = Tables<"orders">;
 export type NewOrder = TablesInsert<"orders">;
 
 // ---------------------------------------------------------------------------
+// Profile
+// ---------------------------------------------------------------------------
+
+/** A Profile row exactly as it comes from the database. */
+export type Profile = Tables<"profiles">;
+
+/** Payload for creating a new Profile. */
+export type NewProfile = TablesInsert<"profiles">;
+
+/** Payload for partially updating an existing Profile. */
+export type UpdateProfile = TablesUpdate<"profiles">;
+
+// ---------------------------------------------------------------------------
 // Service Errors
 // ---------------------------------------------------------------------------
 

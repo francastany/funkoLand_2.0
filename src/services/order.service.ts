@@ -35,7 +35,7 @@ export async function fetchOrdersByUser(userId: string) {
   const { data, error } = await supabase
     .from(TABLE)
     .select("*")
-    .eq("buyer->>id", userId)
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error) throw createServiceError(error.message, error.code);
@@ -47,12 +47,14 @@ export async function createOrder({
   buyer,
   items,
   total,
+  userId,
 }: {
   buyer: { name: string; email: string };
   items: CartItem[];
   total: number;
+  userId?: string;
 }): Promise<void> {
-  const payload: NewOrder = { buyer, items, total };
+  const payload: NewOrder = { buyer, items, total, user_id: userId ?? null };
 
   const { error } = await supabase.from(TABLE).insert(payload);
 

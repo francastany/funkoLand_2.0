@@ -13,8 +13,16 @@ import { useAuthContext } from "@/hooks/useAuth";
 import { createOrder } from "@/services/order.service";
 
 export function CartPage() {
-  const { items, addItem, updateQuantity, removeItem, clearCart, subtotal, taxes, total } =
-    useCartContext();
+  const {
+    items,
+    addItem,
+    updateQuantity,
+    removeItem,
+    clearCart,
+    subtotal,
+    taxes,
+    total,
+  } = useCartContext();
   const { user, signOut } = useAuthContext();
 
   const [form, setForm] = useState({
@@ -42,8 +50,8 @@ export function CartPage() {
 
   const isFormComplete = hasItems && (user ? true : isGuestFormComplete);
 
-  const handleField = (field: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement>) =>
+  const handleField =
+    (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   async function handleCheckout() {
@@ -54,7 +62,12 @@ export function CartPage() {
       : `${form.name} ${form.lastName}`;
 
     try {
-      await createOrder({ buyer: { name, email }, items, total });
+      await createOrder({
+        buyer: { name, email },
+        items,
+        total,
+        userId: user?.id,
+      });
       clearCart();
       toast.success("¡Pedido realizado!", {
         description: `Enviamos el resumen a ${email}.`,
@@ -64,6 +77,11 @@ export function CartPage() {
       toast.error("Error al procesar el pedido", { description: message });
     } finally {
       setIsSubmitting(false);
+      if (user) {
+        location.href = "/account";
+      } else {
+        location.href = "/";
+      }
     }
   }
 

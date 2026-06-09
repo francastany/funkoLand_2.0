@@ -10,6 +10,7 @@ import {
   LogOut,
   ShoppingBasket,
   X,
+  UserRound,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -204,6 +205,14 @@ const Navbar = ({
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
+                    onClick={() => (window.location.href = "/account")}
+                    className="cursor-pointer"
+                  >
+                    <UserRound className="mr-2 size-4" />
+                    <span>Mi Cuenta</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
                     onClick={handleSignOut}
                     className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600 dark:focus:bg-red-950/50 dark:focus:text-red-600"
                   >
@@ -259,14 +268,23 @@ const Navbar = ({
                     </Accordion>
                     <div className="border-t pt-4">
                       {user ? (
-                        <button
-                          type="button"
-                          onClick={handleSignOut}
-                          className="text-md font-semibold py-2 flex items-center gap-2 text-red-600"
-                        >
-                          <LogOut className="size-4" />
-                          Cerrar sesión
-                        </button>
+                        <div className="flex flex-col gap-2">
+                          <a
+                            href="/account"
+                            className="text-md font-semibold py-2 flex items-center gap-2"
+                          >
+                            <UserRound className="size-4" />
+                            Mi Cuenta
+                          </a>
+                          <button
+                            type="button"
+                            onClick={handleSignOut}
+                            className="text-md font-semibold py-2 flex items-center gap-2 text-red-600"
+                          >
+                            <LogOut className="size-4" />
+                            Cerrar sesión
+                          </button>
+                        </div>
                       ) : (
                         <a
                           href={actions.login.url}
@@ -286,11 +304,6 @@ const Navbar = ({
               href={logo.url}
               className="flex items-center justify-self-center gap-2"
             >
-              {/* <img
-                src={logo.src}
-                className="max-h-8 dark:invert"
-                alt={logo.alt}
-              /> */}
               <span className="text-xl italic font-black tracking-tighter">
                 {logo.title}
               </span>
