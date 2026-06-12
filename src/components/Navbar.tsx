@@ -140,11 +140,11 @@ const Navbar = ({
     },
     {
       title: "Nosotros",
-      url: "#",
+      url: "/about",
     },
     {
       title: "Contacto",
-      url: "#",
+      url: "/contact",
     },
   ],
   actions = {
@@ -485,10 +485,10 @@ const renderMobileMenuItem = (item: MenuItem) => {
   if (item.items) {
     return (
       <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-md py-2 font-semibold hover:no-underline">
+        <AccordionTrigger className="text-md py-2 font-semibold font-sans hover:no-underline">
           {item.title}
         </AccordionTrigger>
-        <AccordionContent className="mt-2 [&_a]:no-underline">
+        <AccordionContent className="mt-2 [&_a]:no-underline h-fit">
           {item.items.map((subItem) => (
             <SubMenuLink key={subItem.title} item={subItem} />
           ))}

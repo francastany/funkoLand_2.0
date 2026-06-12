@@ -8,6 +8,8 @@ import { CartPage } from "@/pages/Cart";
 import { Login } from "@/pages/Login";
 import { Register } from "@/pages/Register";
 import { Account } from "@/pages/Account";
+import { Contact } from "@/pages/Contact";
+import { About } from "./pages/About";
 import { Footer } from "@/components/Footer";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
@@ -37,6 +39,8 @@ function App() {
                 <Route path="/funkos/:id" element={<FunkoDetail />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/account" element={<Account />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/about" element={<About />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

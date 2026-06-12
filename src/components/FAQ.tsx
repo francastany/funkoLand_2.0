@@ -35,7 +35,7 @@ const faqItems = [
 
 const FAQ = ({ faqItems }: { faqItems: FAQs }) => {
   return (
-    <section className="py-8">
+    <section className="py-8 mt-8">
       <hr className="border-primary/30 md:hidden mb-8" />
       <div className="mx-auto max-w-6xl sm:px-6 xl:px-0">
         {/* FAQ Header */}

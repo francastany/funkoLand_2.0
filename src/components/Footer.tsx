@@ -169,7 +169,7 @@ const Footer = ({
   return (
     <section
       className={cn(
-        "py-4 mt-16 pt-12 px-6 lg:px-0 max-w-6xl w-full mx-auto border-t",
+        "py-4 mt-16 pt-12 px-6 xl:px-0 max-w-6xl w-full mx-auto border-t",
         className,
       )}
     >
