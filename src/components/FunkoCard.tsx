@@ -4,6 +4,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { Funko } from "@/types";
 import { useCartContext } from "@/hooks/useCart";
+import { useAuthContext } from "@/hooks/useAuth";
+import { useWishlistContext } from "@/hooks/useWishlist";
+import { Button } from "@/components/ui/button";
 
 const categoryColors: Record<string, string> = {
   /*   
@@ -40,6 +43,9 @@ export function FunkoCard({
 }) {
   const navigate = useNavigate();
   const { addItem, isInCart, removeItem } = useCartContext();
+  const { user } = useAuthContext();
+  const { isInWishlist, toggleWishlist } = useWishlistContext();
+  const wishlisted = isInWishlist(funko.id);
   const priceLabel =
     funko.price != null ? `$${funko.price.toFixed(2)}` : "Price unavailable";
   const imageSrc = funko.imgSrc?.[0] ?? "https://placehold.co/500x500";
@@ -49,6 +55,8 @@ export function FunkoCard({
       funko.category.slice(1).toLowerCase()
     : null;
   const isAlreadyInCart = isInCart(funko.id);
+  const isOutOfStock = (funko.stock ?? 0) <= 0;
+  const isDisabled = isAlreadyInCart || isOutOfStock;
 
   return (
     <article
@@ -78,12 +86,43 @@ export function FunkoCard({
           type="button"
           onClick={(event) => {
             event.stopPropagation();
-            alert("Added to wishlist!");
+            if (!user) {
+              toast.info("Iniciá sesión para agregar favoritos");
+              navigate("/login");
+              return;
+            }
+            toggleWishlist(funko.id)
+              .then(() => {
+                toast.success(
+                  wishlisted
+                    ? "Eliminado de favoritos"
+                    : "Agregado a favoritos",
+                  {
+                    description: funko.name,
+                    icon: (
+                      <Heart
+                        className={cn(
+                          "size-4",
+                          !wishlisted && "fill-red-500 text-red-500",
+                        )}
+                      />
+                    ),
+                  },
+                );
+              })
+              .catch(() => {
+                toast.error("Error al actualizar favoritos");
+              });
           }}
-          className="absolute inset-e-4 top-4 z-10 rounded-full bg-white p-2 text-gray-900 hover:text-secondary transition"
+          className={cn(
+            "absolute inset-e-4 top-4 z-10 rounded-full bg-white p-2 transition",
+            wishlisted
+              ? "text-red-500 hover:text-red-600"
+              : "text-gray-900 hover:text-secondary",
+          )}
         >
           <span className="sr-only">Añadir a favoritos</span>
-          <Heart className="size-4" />
+          <Heart className={cn("size-4", wishlisted && "fill-current")} />
         </button>
 
         <img
@@ -113,7 +152,7 @@ export function FunkoCard({
             </button>
           )}
 
-          <h3 className="mt-4 text-lg font-semibold text-gray-900">
+          <h3 className="mt-4 text-lg font-semibold text-gray-900 line-clamp-1">
             {funko.name}
           </h3>
 
@@ -121,14 +160,14 @@ export function FunkoCard({
             {priceLabel}
           </p>
 
-          <form className="mt-4">
-            <button
-              type="button"
-              disabled={isAlreadyInCart}
+          <div className="mt-4">
+            <Button
+              variant={isDisabled ? "outline" : "default"}
+              className="w-full hover:opacity-70 duration-200"
+              disabled={isDisabled}
               onClick={(e) => {
                 e.stopPropagation();
                 if (funko.price == null) return;
-                if (isAlreadyInCart) return;
                 addItem({
                   id: funko.id,
                   name: funko.name,
@@ -147,17 +186,14 @@ export function FunkoCard({
                   },
                 });
               }}
-              className={cn(
-                "block w-full rounded-sm border p-2 text-sm font-medium transition-all",
-                isAlreadyInCart
-                  ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-500"
-                  : "border-primary bg-primary text-white hover:bg-white hover:text-primary",
-              )}
             >
-              {/* <ShoppingCart className="size-4 ml-2" /> */}
-              {isAlreadyInCart ? "En el Carrito" : "Añadir al Carrito"}
-            </button>
-          </form>
+              {isOutOfStock
+                ? "Sin Stock"
+                : isAlreadyInCart
+                  ? "En el Carrito"
+                  : "Añadir al Carrito"}
+            </Button>
+          </div>
         </div>
       </div>
     </article>

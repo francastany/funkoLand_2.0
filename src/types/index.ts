@@ -50,6 +50,13 @@ export type NewProfile = TablesInsert<"profiles">;
 export type UpdateProfile = TablesUpdate<"profiles">;
 
 // ---------------------------------------------------------------------------
+// Wishlist
+// ---------------------------------------------------------------------------
+
+/** A Wishlist row exactly as it comes from the database. */
+export type WishlistItem = Tables<"wishlists">;
+
+// ---------------------------------------------------------------------------
 // Service Errors
 // ---------------------------------------------------------------------------
 

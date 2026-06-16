@@ -11,11 +11,11 @@ type FunkoDetailProps = {
 
 const FunkoDetailSkeleton = () => {
   return (
-    <section className="pb-4">
+    <section className="pb-4 h-screen">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
           <div>
-            <div className="grid gap-4 md:grid-cols-3 xl:gap-5">
+            <div className="col-span-2 grid gap-4 md:grid-cols-3 xl:gap-5">
               <Skeleton className="aspect-square w-full rounded-lg md:col-span-3" />
               <Skeleton className="aspect-square w-full rounded-lg" />
               <Skeleton className="aspect-square w-full rounded-lg" />

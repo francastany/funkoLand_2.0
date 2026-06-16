@@ -11,14 +11,14 @@ const callouts = [
     description: "Tus artistas y bandas favoritas en formato figura.",
     imageSrc: musicCollection,
     imageAlt: "Colección de figuras Funko Pop de músicos y leyendas del rock.",
-    href: "/funkos?category=music",
+    href: "/funkos?category=icons",
   },
   {
     name: "Héroes & Villanos",
     description: "Colecciona los personajes más épicos de los cómics.",
     imageSrc: marvelCollection,
     imageAlt: "Colección de figuras Funko Pop de superhéroes y villanos.",
-    href: "/funkos?category=heros",
+    href: "/funkos?category=heroes",
   },
   {
     name: "Deportes & Cultura",

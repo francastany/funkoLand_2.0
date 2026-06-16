@@ -13,6 +13,8 @@ import {
   ShoppingBag,
   CalendarDays,
   Hash,
+  Heart,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,9 +26,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Price, PriceValue } from "@/components/price";
 import { useAuthContext } from "@/hooks/useAuth";
+import { useWishlistContext } from "@/hooks/useWishlist";
 import { fetchProfile, updateProfile } from "@/services/profile.service";
 import { fetchOrdersByUser } from "@/services/order.service";
-import type { Profile, Order, CartItem } from "@/types";
+import { fetchWishlistWithFunkos } from "@/services/wishlist.service";
+import type { Profile, Order, CartItem, Funko } from "@/types";
 
 export function Account() {
   const navigate = useNavigate();
@@ -34,10 +38,14 @@ export function Account() {
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [wishlistFunkos, setWishlistFunkos] = useState<Funko[]>([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [loadingWishlist, setLoadingWishlist] = useState(true);
   const [saving, setSaving] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+
+  const { removeFromWishlist } = useWishlistContext();
 
   // Form state
   const [form, setForm] = useState({
@@ -83,6 +91,11 @@ export function Account() {
       .then(setOrders)
       .catch(console.error)
       .finally(() => setLoadingOrders(false));
+
+    fetchWishlistWithFunkos(user.id)
+      .then(setWishlistFunkos)
+      .catch(console.error)
+      .finally(() => setLoadingWishlist(false));
   }, [user]);
 
   const handleField =
@@ -314,6 +327,112 @@ export function Account() {
                   </Button>
                 </div>
               </>
+            )}
+          </div>
+        </div>
+
+        {/* ──────────────────── Wishlist Section ──────────────────── */}
+        <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
+          <div className="px-6 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Heart className="size-5 text-red-500" />
+                <h2 className="text-xl font-bold text-foreground">
+                  Mis Favoritos
+                </h2>
+              </div>
+              {!loadingWishlist && (
+                <Badge variant="secondary" className="text-xs">
+                  {wishlistFunkos.length}{" "}
+                  {wishlistFunkos.length === 1 ? "favorito" : "favoritos"}
+                </Badge>
+              )}
+            </div>
+
+            <Separator className="my-5" />
+
+            {loadingWishlist ? (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-32 rounded-xl" />
+                ))}
+              </div>
+            ) : wishlistFunkos.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="flex size-16 items-center justify-center rounded-full bg-muted mb-4">
+                  <Heart className="size-7 text-muted-foreground" />
+                </div>
+                <p className="text-lg font-semibold text-foreground">
+                  Sin favoritos aún
+                </p>
+                <p className="mt-1 max-w-[32ch] text-sm text-muted-foreground">
+                  Explorá nuestra colección y agregá tus Funkos favoritos.
+                </p>
+                <Button asChild className="mt-6" variant="outline">
+                  <a href="/funkos">Explorar Funkos</a>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {wishlistFunkos.map((funko) => (
+                  <div
+                    key={funko.id}
+                    className="group relative flex items-center gap-4 rounded-xl border bg-background/50 p-4 transition-all duration-200 hover:shadow-sm cursor-pointer"
+                    role="link"
+                    tabIndex={0}
+                    onClick={() => navigate(`/funkos/${funko.id}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        navigate(`/funkos/${funko.id}`);
+                      }
+                    }}
+                  >
+                    <div className="size-20 shrink-0 overflow-hidden rounded-lg border bg-muted">
+                      <img
+                        src={funko.imgSrc?.[0] ?? "https://placehold.co/96x96"}
+                        alt={funko.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {funko.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {funko.category
+                          ? funko.category.charAt(0).toUpperCase() +
+                            funko.category.slice(1)
+                          : "Sin categoría"}
+                      </p>
+                      <p className="text-sm font-bold text-foreground mt-1">
+                        ${funko.price?.toFixed(2) ?? "—"}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 text-muted-foreground hover:text-red-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFromWishlist(funko.id).then(() => {
+                          setWishlistFunkos((prev) =>
+                            prev.filter((f) => f.id !== funko.id),
+                          );
+                          toast.success("Eliminado de favoritos", {
+                            description: funko.name,
+                          });
+                        }).catch(() => {
+                          toast.error("Error al eliminar de favoritos");
+                        });
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                      <span className="sr-only">Eliminar de favoritos</span>
+                    </Button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>

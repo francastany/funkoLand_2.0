@@ -1,4 +1,6 @@
-import { CircleCheck, Star, StarHalf } from "lucide-react";
+import { CircleCheck, CircleX, Heart, ShoppingCart, Star, StarHalf } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import type { Funko } from "@/types";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +15,10 @@ import { cn } from "@/lib/utils";
 import { Incentives } from "@/components/ui/incentives";
 import sentenceCase from "@/utils/utils";
 import { Button } from "./ui/button";
+import QuantityInput from "@/components/quantity-input";
 import { useCartContext } from "@/hooks/useCart";
+import { useAuthContext } from "@/hooks/useAuth";
+import { useWishlistContext } from "@/hooks/useWishlist";
 
 interface ProductImagesProps {
   images: Array<{
@@ -52,21 +57,18 @@ const HARD_CODED_REVIEWS = {
 };
 
 const ProductDetail = ({ className, funko }: ProductDetailProps) => {
-  const images = [
-    {
-      src: funko.imgSrc[0] ?? PLACEHOLDER_IMAGE,
-      alt: funko.name ?? "Funko Image",
-    },
-    {
-      src: funko.imgSrc[1] ?? PLACEHOLDER_IMAGE,
-      alt: funko.name ?? "Funko Image 02",
-    },
-    {
-      src: funko.imgSrc[2] ?? PLACEHOLDER_IMAGE,
-      alt: funko.name ?? "Funko Image 03",
-    },
-  ];
+  const { addItem, isInCart, items, updateQuantity, removeItem } = useCartContext();
+  const { user } = useAuthContext();
+  const { isInWishlist, toggleWishlist } = useWishlistContext();
+  const navigate = useNavigate();
+  const wishlisted = isInWishlist(funko.id);
 
+  const images = funko.imgSrc.map((img, index) => {
+    return {
+      src: img || PLACEHOLDER_IMAGE,
+      alt: `${funko.name} | Foto ${index + 1}`,
+    };
+  });
   const isInStock = (funko.stock ?? 0) > 0;
 
   return (
@@ -76,23 +78,32 @@ const ProductDetail = ({ className, funko }: ProductDetailProps) => {
           <div className="col-span-2 order-2 md:order-1 space-y-8 pt-8 h-full">
             <header>
               <div className="flex justify-between items-start">
-                <h1 className="text-4xl max-md:leading-snug grow font-bold tracking-tight lg:text-5xl">
+                <h1 className="text-4xl leading-snug grow font-bold tracking-tight lg:text-5xl">
                   {funko.name}
                 </h1>
                 <Price value={funko.price} currency="USD" />
               </div>
               <div className="mt-4 flex flex-wrap items-center gap-4">
+                <Badge
+                  variant={isInStock ? "default" : "destructive"}
+                  className="cursor-default flex items-center"
+                >
+                  {isInStock ? (
+                    <>
+                      <CircleCheck />
+                      <span className="text-white">En Stock</span>
+                    </>
+                  ) : (
+                    <>
+                      <CircleX />
+                      <span>Sin Stock</span>
+                    </>
+                  )}
+                </Badge>
                 <Reviews
                   rate={HARD_CODED_REVIEWS.rate}
                   totalReviewers={HARD_CODED_REVIEWS.totalReviewers}
                 />
-                <Badge
-                  variant={isInStock ? "secondary" : "outline"}
-                  className="text-white"
-                >
-                  <CircleCheck />
-                  {isInStock ? "In Stock" : "Out of Stock"}
-                </Badge>
               </div>
             </header>
 
@@ -100,20 +111,92 @@ const ProductDetail = ({ className, funko }: ProductDetailProps) => {
               {funko.description ?? "Descripción no disponible."}
             </p>
 
-            <div className="w-full flex items-center gap-4">
+            <div className="w-full flex flex-col md:flex-row items-center gap-2 md:gap-4 *:py-5">
+              {isInCart(funko.id) ? (
+                <div className="flex items-center gap-3">
+                  <ShoppingCart className="size-4 text-primary shrink-0" />
+                  <QuantityInput
+                    className="max-w-36"
+                    min={0}
+                    max={funko.stock ?? 99}
+                    inputProps={{ value: items.find((i) => i.id === funko.id)?.quantity ?? 1 }}
+                    onValueChange={(qty) => {
+                      if (qty <= 0) {
+                        removeItem(funko.id);
+                        toast.info("Eliminado del carrito", { description: funko.name });
+                      } else {
+                        updateQuantity(funko.id, qty);
+                      }
+                    }}
+                  />
+                </div>
+              ) : (
+                <Button
+                  onClick={() => {
+                    addItem({
+                      id: funko.id,
+                      name: funko.name,
+                      image: funko.imgSrc?.[0],
+                      price: funko.price,
+                    });
+                    toast.success("Agregado al carrito", {
+                      description: funko.name,
+                    });
+                  }}
+                  variant="default"
+                  size="lg"
+                  disabled={!isInStock}
+                  className="hover:opacity-75 transition-opacity duration-200"
+                >
+                  Agregar al Carrito
+                </Button>
+              )}
               <Button
-                onClick={() => useCartContext().addItem(funko)}
-                variant="default"
+                variant={wishlisted ? "default" : "outline"}
                 size="lg"
+                className={cn(
+                  "gap-2",
+                  wishlisted && "bg-red-500 hover:bg-red-600 border-red-500",
+                )}
+                onClick={() => {
+                  if (!user) {
+                    toast.info("Iniciá sesión para agregar favoritos");
+                    navigate("/login");
+                    return;
+                  }
+                  toggleWishlist(funko.id)
+                    .then(() => {
+                      toast.success(
+                        wishlisted
+                          ? "Eliminado de favoritos"
+                          : "Agregado a favoritos",
+                        {
+                          description: funko.name,
+                          icon: (
+                            <Heart
+                              className={cn(
+                                "size-4",
+                                !wishlisted && "fill-red-500 text-red-500",
+                              )}
+                            />
+                          ),
+                        },
+                      );
+                    })
+                    .catch(() => {
+                      toast.error("Error al actualizar favoritos");
+                    });
+                }}
               >
-                Agregar al Carrito
+                <Heart className={cn("size-4", wishlisted && "fill-current")} />
+                {wishlisted ? "En Favoritos" : "Añadir a Favoritos"}
               </Button>
             </div>
 
             <ProductInfo
               info={[
                 {
-                  label: "Categoria",
+                  label: "Categoría",
                   value: sentenceCase(funko.category ?? "No disponible"),
                 },
                 {
@@ -125,7 +208,9 @@ const ProductDetail = ({ className, funko }: ProductDetailProps) => {
 
             <Incentives />
           </div>
-          <ProductImages images={images} />
+          <div className="lg:sticky lg:top-8 lg:h-fit">
+            <ProductImages images={images} />
+          </div>
         </div>
       </div>
     </section>
@@ -146,7 +231,7 @@ const ProductInfo = ({ info }: ProductInfoProps) => {
             <dt className="text-sm font-medium text-muted-foreground">
               {item.label}
             </dt>
-            <dd className="text-sm font-medium">{item.value}</dd>
+            <dd className="text-sm font-medium italic">{item.value}</dd>
           </div>
         ))}
       </dl>
@@ -235,7 +320,7 @@ const Reviews = ({ rate, totalReviewers }: ReviewsProps) => {
       <div className="flex items-center gap-1">{renderStars()}</div>
       {totalReviewers && (
         <p className="text-base leading-none font-medium whitespace-nowrap text-muted-foreground">
-          {totalReviewers} reviews
+          {totalReviewers} Calificaciones
         </p>
       )}
     </div>

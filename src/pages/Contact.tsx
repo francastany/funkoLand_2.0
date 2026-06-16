@@ -17,11 +17,12 @@ export function Contact() {
 
         <div className="grid items-start gap-12 lg:grid-cols-2">
           {/* Image Section */}
-          <figure className="rounded-lg overflow-hidden shadow-sm">
+          <figure className="rounded-lg overflow-visible">
             <img
               src={contactImage}
               alt="Ilustración de contacto de FunkoLand"
-              className="size-full object-cover object-center hover:scale-105 hover:rotate-3 transition-transform duration-300 ease-in-out"
+              className="size-full object-cover object-center hover:scale-105 hover:-rotate-3 transition-transform duration-300 ease-in-out"
+              style={{ mixBlendMode: "multiply" }}
             />
           </figure>
 
