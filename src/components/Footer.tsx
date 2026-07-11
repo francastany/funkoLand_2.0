@@ -1,8 +1,4 @@
-import type { LucideIcon } from "lucide-react";
-import { Clock, MapPin, Phone } from "lucide-react";
 import { Fragment } from "react";
-
-import { Button } from "@/components/ui/button";
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -21,149 +17,60 @@ interface FooterLinksSectionProps {
   sections: FooterLinksSectionData[];
 }
 
-type SocialIcon = {
-  title: string;
-  src: string;
-  className?: string;
-};
-
-type SocialLink = {
-  link: string;
-  icon: SocialIcon;
-};
-
-type ContactLink = {
-  icon: LucideIcon;
-  text: string;
-  type: LinkTypes;
-  link?: string;
-};
-
-type ContactLinks = {
-  contactDetails: ContactLink[];
-  socialMedia: SocialLink[];
-};
-
-interface ContactSectionProps {
-  links: ContactLinks;
-}
-
 interface FooterProps {
   // newsletter?: NewsletterData;
   footerLinks?: FooterLinksSectionData[];
-  contactLinks?: ContactLinks;
   className?: string;
 }
 
-const LINK_TYPES = {
-  NO_LINK: "NO_LINK",
-  PHONE_LINK: "PHONE_LINK",
-  EMAIL_LINK: "EMAIL_LINK",
-};
-
-type LinkTypes = keyof typeof LINK_TYPES;
-
 const FOOTER_LINKS: FooterLinksSectionData[] = [
   {
-    title: "Information",
+    title: "Información",
     items: [
       {
-        text: "Terms and Conditions",
-        link: "#",
+        text: "Términos y Condiciones",
+        link: "/information#terms",
       },
       {
-        text: "Privacy Policy",
-        link: "#",
+        text: "Política de Privacidad",
+        link: "/information#privacy",
       },
       {
-        text: "Shipping Policy",
-        link: "#",
+        text: "Política de Envíos",
+        link: "/information#shipping",
       },
       {
-        text: "Refund Policy",
-        link: "#",
+        text: "Política de Reembolsos",
+        link: "/information#refund",
       },
     ],
   },
   {
-    title: "Categories",
+    title: "Categorías",
     items: [
       {
-        text: "Pop! Animation",
-        link: "#",
+        text: "Movies",
+        link: "/funkos?category=movies",
       },
       {
-        text: "Pop! Marvel",
-        link: "#",
+        text: "Sports",
+        link: "/funkos?category=sports",
       },
       {
-        text: "Pop! Star Wars",
-        link: "#",
+        text: "Icons",
+        link: "/funkos?category=icons",
       },
       {
-        text: "Exclusives",
-        link: "#",
+        text: "Heroes",
+        link: "/funkos?category=heroes",
       },
     ],
   },
 ];
 
-const SOCIAL_ICONS = {
-  facebook: {
-    title: "Facebook",
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/facebook-icon.svg",
-  },
-  x: {
-    title: "X",
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/x.svg",
-    className: "dark:invert",
-  },
-  instagram: {
-    title: "Instagram",
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/instagram-icon.svg",
-  },
-};
-
-const CONTACT_LINKS: ContactLinks = {
-  contactDetails: [
-    {
-      icon: MapPin,
-      text: "info@funkoland.com",
-      link: "info@funkoland.com",
-      type: LINK_TYPES.EMAIL_LINK as LinkTypes,
-    },
-    {
-      icon: Phone,
-      text: "+1 800-FUNKOS",
-      link: "+1 800-FUNKOS",
-      type: LINK_TYPES.PHONE_LINK as LinkTypes,
-    },
-    {
-      icon: Clock,
-      text: "Mon - Fri, 10 am - 8 pm",
-      type: LINK_TYPES.NO_LINK as LinkTypes,
-    },
-  ],
-  socialMedia: [
-    {
-      icon: SOCIAL_ICONS.facebook,
-      link: "#",
-    },
-    {
-      icon: SOCIAL_ICONS.x,
-      link: "#",
-    },
-    {
-      icon: SOCIAL_ICONS.instagram,
-      link: "#",
-    },
-  ],
-};
-
 const Footer = ({
   // newsletter = NEWSLETTER_DATA,
   footerLinks = FOOTER_LINKS,
-  contactLinks = CONTACT_LINKS,
   className,
 }: FooterProps) => {
   return (
@@ -179,7 +86,7 @@ const Footer = ({
             <NewsletterSection {...newsletter} />
           </div> */}
           <FooterLinksSection sections={footerLinks} />
-          <ContactSection links={contactLinks} />
+          <BrandSection />
         </div>
         <Separator className="" />
         <div className="flex flex-wrap items-center justify-between">
@@ -215,54 +122,16 @@ const FooterLinksSection = ({ sections }: FooterLinksSectionProps) => {
   );
 };
 
-const ContactSection = ({ links }: ContactSectionProps) => {
-  const { socialMedia, contactDetails } = links;
-
+const BrandSection = () => {
   return (
-    <div>
-      <h2 className="mb-6 text-sm leading-tight font-medium text-muted-foreground uppercase">
-        Contact
-      </h2>
-      <div className="space-y-6">
-        <ul className="space-y-3">
-          {contactDetails.map((item) => (
-            <li className="flex items-center gap-3" key={item.text}>
-              <item.icon className="size-4 shrink-0 basis-4" />
-              <div className="flex-1">
-                {item.type === LINK_TYPES.NO_LINK ? (
-                  <p>{item.text}</p>
-                ) : (
-                  <a
-                    href={
-                      item.type === "EMAIL_LINK"
-                        ? `mailto:${item.link}`
-                        : `tel:${item.link}`
-                    }
-                    className="underline-offset-4 hover:underline"
-                  >
-                    {item.text}
-                  </a>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-        <ul className="flex flex-wrap gap-3">
-          {socialMedia.map(({ icon, link }) => (
-            <li key={icon.title}>
-              <Button size="icon-lg" variant="outline" asChild>
-                <a href={link}>
-                  <img
-                    className={cn("size-5", icon.className)}
-                    alt={icon.title}
-                    src={icon.src}
-                  />
-                </a>
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className="self-end">
+      <span className="text-primary font-display italic font-bold text-2xl">
+        funkoLand
+      </span>
+      <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+        Tu colección Funko,
+        <span className="font-semibold italic"> en un solo lugar.</span>
+      </p>
     </div>
   );
 };

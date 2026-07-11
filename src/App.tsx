@@ -10,6 +10,7 @@ import { Register } from "@/pages/Register";
 import { Account } from "@/pages/Account";
 import { Contact } from "@/pages/Contact";
 import { About } from "./pages/About";
+import { Information } from "@/pages/Information";
 import { Footer } from "@/components/Footer";
 import { AuthProvider } from "@/hooks/useAuth";
 import { WishlistProvider } from "@/hooks/useWishlist";
@@ -43,6 +44,7 @@ function App() {
                   <Route path="/account" element={<Account />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/information" element={<Information />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
