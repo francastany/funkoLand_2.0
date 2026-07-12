@@ -90,8 +90,19 @@ const Footer = ({
         </div>
         <Separator className="" />
         <div className="flex flex-wrap items-center justify-between">
-          <p className="text-muted-foreground max-md:text-xs">
-            Copyright © 2026 FunkoLand
+          <p className="text-muted-foreground md:text-sm text-xs">
+            Todos los derechos reservados © 2026 FunkoLand
+          </p>
+          <p className="text-muted-foreground md:text-sm text-xs">
+            Desarrollado por{" "}
+            <a
+              href="https://saltocreativos.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold italic hover:underline"
+            >
+              SALTO Agencia Creativa
+            </a>
           </p>
         </div>
       </div>
